@@ -130,7 +130,7 @@ function createMarkup(hits) {
       ${hit.downloads}
     </p>
   </div>
-</div>;
+</div>
     </a>`;
     })
     .join('');
