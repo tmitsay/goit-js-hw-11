@@ -3,6 +3,7 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { URL, options } from './api';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { requestOnApi } from './get-async';
 
 let totalHits = 0;
 let reachedEnd = false;
@@ -45,8 +46,9 @@ async function loadMore() {
 
   try {
     loaderShow();
-    const response = await axios.get(URL, options);
-    const hits = response.data.hits;
+    // const response = await axios.get(URL, options);
+    const resp = (await requestOnApi()).data;
+    const hits = resp.hits;
     createMarkup(hits);
   } catch (err) {
     Notify.failure(err);
@@ -64,7 +66,7 @@ function onScrollMore() {
     scrollTop + clientHeight >= scrollHeight - scrollMax &&
     galleryDiv.innerHTML !== '' &&
     !isLoadMore &&
-    reachedEnd
+    !reachedEnd
   ) {
     loadMore();
   }
@@ -82,18 +84,21 @@ async function onFormSubmit(event) {
 
   try {
     loaderShow();
-    const response = await axios.get(URL, options);
-    totalHits = response.data.totalHits;
-    const hits = response.data.hits;
+    // const response = await axios.get(URL, options);
+    const resp = (await requestOnApi()).data;
+    totalHits = resp.totalHits;
+    const hits = resp.hits;
+
+    console.log(resp);
 
     if (hits.length === 0) {
       Notify.failure('Sorry. Try again, please');
     } else {
       Notify.success(`Hooray! We found ${totalHits} images.`);
-
+      // reachedEnd = true;
       createMarkup(hits);
     }
-    input.name.value = '';
+    searchInput.value = '';
     hideLoader();
   } catch (err) {
     // Notify.failure(err);
